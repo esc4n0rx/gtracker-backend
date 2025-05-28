@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const NotificationService = require('./notificationService');
 
 class RoleService {
     // Buscar todos os cargos disponíveis
@@ -99,6 +100,14 @@ class RoleService {
 
             // Registrar a mudança de cargo (para auditoria)
             await this.logRoleChange(userId, changedBy.id, newRoleId);
+
+
+            await NotificationService.notifyRoleChange(
+                userId,
+                newRole.name,
+                newRole.display_name,
+                changedBy.nickname
+            );
 
             return {
                 success: true,

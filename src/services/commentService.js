@@ -1,5 +1,6 @@
 // src/services/commentService.js
 const supabase = require('../config/supabase');
+const NotificationService = require('./notificationService');
 
 class CommentService {
     // Criar comentário
@@ -102,6 +103,39 @@ class CommentService {
             // Atualizar contagem de comentários do usuário
             await supabase.rpc('increment_user_comment_count', { user_id: userId });
 
+            const { data: commenter, error: commenterError } = await supabase
+                .from('gtracker_users')
+                .select('nickname, nome')
+                .eq('id', userId)
+                .single();
+
+            if (!commenterError && commenter) {
+                // Processar menções no conteúdo do comentário
+                await NotificationService.processMentions(
+                    content,
+                    userId,
+                    commenter.nickname,
+                    post_id,
+                    newComment.id
+                );
+
+                // Notificar o autor do post (se não for resposta a comentário)
+                if (!parent_comment_id) {
+                    await NotificationService.notifyPostReply(
+                        post_id,
+                        userId,
+                        commenter.nickname
+                    );
+                } else {
+                    // Notificar o autor do comentário pai
+                    await NotificationService.notifyCommentReply(
+                        parent_comment_id,
+                        userId,
+                        commenter.nickname
+                    );
+                }
+            }
+
             return {
                 success: true,
                 message: 'Comentário criado com sucesso',
@@ -109,7 +143,10 @@ class CommentService {
                     ...newComment,
                     author: newComment.gtracker_users
                 }
+
+                
             };
+
 
         } catch (error) {
             console.error('Erro ao criar comentário:', error);
@@ -449,6 +486,14 @@ class CommentService {
                     .from('gtracker_comments')
                     .update({ like_count: comment.like_count + 1 })
                     .eq('id', commentId);
+
+                 if (!likerError && liker) {
+                    await NotificationService.notifyCommentLike(
+                        commentId,
+                        userId,
+                        liker.nickname
+                    );
+                }
 
                 return {
                     success: true,

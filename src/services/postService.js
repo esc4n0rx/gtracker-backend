@@ -1,6 +1,7 @@
 // src/services/postService.js
 const supabase = require('../config/supabase');
 const { v4: uuidv4 } = require('uuid');
+const NotificationService = require('./notificationService');
 
 class PostService {
     // Verificar se usuário pode criar posts
@@ -90,6 +91,7 @@ class PostService {
                 .from('gtracker_users')
                 .select(`
                     id,
+                    nickname,
                     gtracker_roles!inner(name, nivel, pode_postar)
                 `)
                 .eq('id', userId)
@@ -141,17 +143,17 @@ class PostService {
                 }
             }
 
-            if (postType === 'anuncio_oficial') {
+            // Validação específica para anúncio oficial
+            if (post_type === 'anuncio_oficial') {
                 const requiredFields = ['titulo', 'mensagem'];
                 for (const field of requiredFields) {
-                    if (!templateData[field] && !postData.title && !postData.content) {
+                    if (!template_data[field] && !title && !content) {
                         return { 
-                            valid: false, 
+                            success: false, 
                             message: `Dados obrigatórios para anúncio oficial não preenchidos` 
                         };
                     }
                 }
-                return { valid: true };
             }
 
             // Gerar slug único
@@ -188,6 +190,16 @@ class PostService {
 
             // Atualizar contagem de posts do usuário
             await supabase.rpc('increment_user_post_count', { user_id: userId });
+
+            // Processar menções no conteúdo
+            if (content) {
+                await NotificationService.processMentions(
+                    content, 
+                    userId, 
+                    user.nickname, 
+                    newPost.id
+                );
+            }
 
             // Atualizar estatísticas do fórum
             await supabase.rpc('update_forum_stats', { 
@@ -412,7 +424,6 @@ class PostService {
             const updateFields = { updated_by: userId };
 
             if (title !== undefined) {
-                // Gerar novo slug se o título mudou
                 if (title !== post.title) {
                     updateFields.slug = await this.generateSlug(title, postId);
                 }
@@ -424,7 +435,6 @@ class PostService {
             }
 
             if (template_data !== undefined) {
-                // Validar dados do template se não for post geral
                 if (post.post_type !== 'general') {
                     const validation = this.validateTemplateData(post.post_type, template_data);
                     if (!validation.valid) {
@@ -561,6 +571,7 @@ class PostService {
                 .from('gtracker_users')
                 .select(`
                     id,
+                    nickname,
                     gtracker_roles!inner(name, nivel, pode_mover_topicos)
                 `)
                 .eq('id', userId)
@@ -576,7 +587,7 @@ class PostService {
             // Verificar se o post e fórum existem
             const { data: post, error: postError } = await supabase
                 .from('gtracker_posts')
-                .select('id, forum_id')
+                .select('id, forum_id, author_id')
                 .eq('id', postId)
                 .eq('is_active', true)
                 .single();
@@ -609,6 +620,13 @@ class PostService {
                 };
             }
 
+            // Buscar nome do fórum de origem
+            const { data: fromForum, error: fromError } = await supabase
+                .from('gtracker_forums')
+                .select('name')
+                .eq('id', post.forum_id)
+                .single();
+
             // Mover o post
             const { error: moveError } = await supabase
                 .from('gtracker_posts')
@@ -632,6 +650,18 @@ class PostService {
                     moved_by: userId,
                     reason
                 });
+
+            // Notificar autor do post sobre a movimentação
+            if (!fromError && fromForum) {
+                await NotificationService.notifyPostMoved(
+                    postId,
+                    post.author_id,
+                    fromForum.name,
+                    newForum.name,
+                    user.nickname,
+                    reason
+                );
+            }
 
             // Atualizar estatísticas dos fóruns
             await supabase.rpc('update_forum_stats_after_move', {
@@ -659,7 +689,7 @@ class PostService {
             // Verificar se o post existe
             const { data: post, error: postError } = await supabase
                 .from('gtracker_posts')
-                .select('id, like_count')
+                .select('id, like_count, author_id')
                 .eq('id', postId)
                 .eq('is_active', true)
                 .single();
@@ -714,6 +744,21 @@ class PostService {
                     .from('gtracker_posts')
                     .update({ like_count: post.like_count + 1 })
                     .eq('id', postId);
+
+                // Buscar dados do usuário que curtiu para notificação
+                const { data: liker, error: likerError } = await supabase
+                    .from('gtracker_users')
+                    .select('nickname, nome')
+                    .eq('id', userId)
+                    .single();
+
+                if (!likerError && liker) {
+                    await NotificationService.notifyPostLike(
+                        postId,
+                        userId,
+                        liker.nickname
+                    );
+                }
 
                 return {
                     success: true,

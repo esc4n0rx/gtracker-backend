@@ -321,6 +321,18 @@ const updateCommentSchema = Joi.object({
         })
 });
 
+const notificationSettingsSchema = Joi.object({
+    post_replies: Joi.boolean().optional(),
+    comment_replies: Joi.boolean().optional(),
+    post_likes: Joi.boolean().optional(),
+    comment_likes: Joi.boolean().optional(),
+    mentions: Joi.boolean().optional(),
+    administrative: Joi.boolean().optional(),
+    private_messages: Joi.boolean().optional(),
+    email_notifications: Joi.boolean().optional(),
+    push_notifications: Joi.boolean().optional()
+});
+
 
 
 
@@ -337,5 +349,6 @@ module.exports = {
     updatePostSchema,
     movePostSchema,
     commentSchema,
-    updateCommentSchema
+    updateCommentSchema,
+    notificationSettingsSchema
 };

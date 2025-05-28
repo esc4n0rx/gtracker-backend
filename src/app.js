@@ -14,6 +14,7 @@ const forumRoutes = require('./routes/forums');
 const postRoutes = require('./routes/posts');
 const commentRoutes = require('./routes/comments');
 const searchRoutes = require('./routes/search');
+const notificationRoutes = require('./routes/notifications');
 
 // Importar middlewares
 const { generalLimiter } = require('./middlewares/rateLimiter');
@@ -55,6 +56,7 @@ app.use('/api/forums', forumRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Rota de health check
 app.get('/api/health', (req, res) => {
