@@ -71,8 +71,26 @@ const updateProfileSchema = Joi.object({
         })
 });
 
+
+const changeRoleSchema = Joi.object({
+    role_id: Joi.string()
+        .uuid()
+        .required()
+        .messages({
+            'string.uuid': 'ID do cargo deve ser um UUID válido',
+            'any.required': 'ID do cargo é obrigatório'
+        }),
+    reason: Joi.string()
+        .max(500)
+        .optional()
+        .messages({
+            'string.max': 'Motivo deve ter no máximo 500 caracteres'
+        })
+});
+
 module.exports = {
     registerSchema,
     loginSchema,
-    updateProfileSchema
+    updateProfileSchema,
+    changeRoleSchema
 };

@@ -107,10 +107,11 @@ class AuthService {
                 .from('gtracker_roles')
                 .select('id')
                 .eq('name', 'member')
+                .eq('is_active', true)
                 .single();
 
             if (roleError) {
-                throw new Error('Erro ao buscar role padrão: ' + roleError.message);
+                throw new Error('Erro ao buscar cargo padrão: ' + roleError.message);
             }
 
             // Criar usuário

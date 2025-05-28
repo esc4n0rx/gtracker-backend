@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -7,6 +6,8 @@ require('dotenv').config();
 // Importar rotas
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
+const roleRoutes = require('./routes/roles');
+const userRoutes = require('./routes/users');
 
 // Importar middlewares
 const { generalLimiter } = require('./middlewares/rateLimiter');
@@ -41,6 +42,8 @@ if (process.env.NODE_ENV === 'development') {
 // Rotas da API
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/roles', roleRoutes);
+app.use('/api/users', userRoutes);
 
 // Rota de health check
 app.get('/api/health', (req, res) => {
