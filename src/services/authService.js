@@ -1,4 +1,4 @@
-
+// src/services/authService.js - VERSÃO FINAL CORRIGIDA
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const supabase = require('../config/supabase');
@@ -192,10 +192,10 @@ class AuthService {
         }
     }
 
-    // Login do usuário
+    // Login do usuário - VERSÃO CORRIGIDA COM RELACIONAMENTO
     static async loginUser(email, password, ip) {
         try {
-            // Buscar usuário com role
+            // Buscar usuário com role usando JOIN explícito
             const { data: user, error: userError } = await supabase
                 .from('gtracker_users')
                 .select(`
@@ -205,17 +205,50 @@ class AuthService {
                     password_hash,
                     nome,
                     is_active,
-                    gtracker_roles!inner(name, display_name, level, permissions)
+                    role_id,
+                    gtracker_roles (
+                        id,
+                        name,
+                        display_name,
+                        nivel,
+                        color,
+                        pode_postar,
+                        pode_comentar,
+                        pode_curtir,
+                        pode_criar_topicos,
+                        pode_upload,
+                        pode_moderar,
+                        pode_editar_posts_outros,
+                        pode_deletar_posts_outros,
+                        pode_banir_usuarios,
+                        pode_mover_topicos,
+                        pode_fechar_topicos,
+                        acesso_admin,
+                        pode_gerenciar_usuarios,
+                        pode_gerenciar_cargos,
+                        pode_ver_logs,
+                        pode_configurar_forum
+                    )
                 `)
                 .eq('email', email)
                 .single();
 
             if (userError || !user) {
+                console.error('Erro ao buscar usuário:', userError);
                 // Registrar tentativa falhada
                 await this.recordFailedAttempt(ip, email);
                 return {
                     success: false,
                     message: 'Email ou senha incorretos'
+                };
+            }
+
+            // Verificar se encontrou o role
+            if (!user.gtracker_roles) {
+                console.error('Usuário sem role associado:', user.id);
+                return {
+                    success: false,
+                    message: 'Erro na configuração do usuário. Entre em contato com o suporte.'
                 };
             }
 
@@ -263,7 +296,31 @@ class AuthService {
                         id: user.id,
                         nickname: user.nickname,
                         nome: user.nome,
-                        role: user.gtracker_roles
+                        role: {
+                            id: user.gtracker_roles.id,
+                            name: user.gtracker_roles.name,
+                            display_name: user.gtracker_roles.display_name,
+                            nivel: user.gtracker_roles.nivel,
+                            color: user.gtracker_roles.color,
+                            permissions: {
+                                pode_postar: user.gtracker_roles.pode_postar,
+                                pode_comentar: user.gtracker_roles.pode_comentar,
+                                pode_curtir: user.gtracker_roles.pode_curtir,
+                                pode_criar_topicos: user.gtracker_roles.pode_criar_topicos,
+                                pode_upload: user.gtracker_roles.pode_upload,
+                                pode_moderar: user.gtracker_roles.pode_moderar,
+                                pode_editar_posts_outros: user.gtracker_roles.pode_editar_posts_outros,
+                                pode_deletar_posts_outros: user.gtracker_roles.pode_deletar_posts_outros,
+                                pode_banir_usuarios: user.gtracker_roles.pode_banir_usuarios,
+                                pode_mover_topicos: user.gtracker_roles.pode_mover_topicos,
+                                pode_fechar_topicos: user.gtracker_roles.pode_fechar_topicos,
+                                acesso_admin: user.gtracker_roles.acesso_admin,
+                                pode_gerenciar_usuarios: user.gtracker_roles.pode_gerenciar_usuarios,
+                                pode_gerenciar_cargos: user.gtracker_roles.pode_gerenciar_cargos,
+                                pode_ver_logs: user.gtracker_roles.pode_ver_logs,
+                                pode_configurar_forum: user.gtracker_roles.pode_configurar_forum
+                            }
+                        }
                     }
                 }
             };
