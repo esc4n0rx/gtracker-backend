@@ -218,6 +218,111 @@ const updateForumSchema = Joi.object({
         .optional()
 });
 
+const postSchema = Joi.object({
+    title: Joi.string()
+        .min(5)
+        .max(255)
+        .required()
+        .messages({
+            'string.min': 'Título deve ter pelo menos 5 caracteres',
+            'string.max': 'Título deve ter no máximo 255 caracteres'
+        }),
+    content: Joi.string()
+        .max(50000)
+        .optional()
+        .allow('')
+        .messages({
+            'string.max': 'Conteúdo deve ter no máximo 50.000 caracteres'
+        }),
+    forum_id: Joi.string()
+        .uuid()
+        .required()
+        .messages({
+            'string.uuid': 'ID do fórum deve ser um UUID válido'
+        }),
+    post_type: Joi.string()
+        .valid('general', 'filme', 'série', 'jogo', 'software', 'curso', 'ebook', 
+              'pedido_arquivo', 'candidatura', 'regras', 'anuncio_oficial', 
+              'sugestao', 'fale_conosco', 'apresentacao', 'duvida_suporte')
+        .default('general'),
+    template_data: Joi.object()
+        .optional()
+        .default({})
+});
+
+const updatePostSchema = Joi.object({
+    title: Joi.string()
+        .min(5)
+        .max(255)
+        .optional()
+        .messages({
+            'string.min': 'Título deve ter pelo menos 5 caracteres',
+            'string.max': 'Título deve ter no máximo 255 caracteres'
+        }),
+    content: Joi.string()
+        .max(50000)
+        .optional()
+        .allow('')
+        .messages({
+            'string.max': 'Conteúdo deve ter no máximo 50.000 caracteres'
+        }),
+    template_data: Joi.object()
+        .optional()
+});
+
+const movePostSchema = Joi.object({
+    forum_id: Joi.string()
+        .uuid()
+        .required()
+        .messages({
+            'string.uuid': 'ID do fórum deve ser um UUID válido'
+        }),
+    reason: Joi.string()
+        .max(500)
+        .optional()
+        .allow('')
+        .messages({
+            'string.max': 'Motivo deve ter no máximo 500 caracteres'
+        })
+});
+
+const commentSchema = Joi.object({
+    post_id: Joi.string()
+        .uuid()
+        .required()
+        .messages({
+            'string.uuid': 'ID do post deve ser um UUID válido'
+        }),
+    parent_comment_id: Joi.string()
+        .uuid()
+        .optional()
+        .allow(null)
+        .messages({
+            'string.uuid': 'ID do comentário pai deve ser um UUID válido'
+        }),
+    content: Joi.string()
+        .min(1)
+        .max(10000)
+        .required()
+        .messages({
+            'string.min': 'Comentário não pode estar vazio',
+            'string.max': 'Comentário deve ter no máximo 10.000 caracteres'
+        })
+});
+
+const updateCommentSchema = Joi.object({
+    content: Joi.string()
+        .min(1)
+        .max(10000)
+        .required()
+        .messages({
+            'string.min': 'Comentário não pode estar vazio',
+            'string.max': 'Comentário deve ter no máximo 10.000 caracteres'
+        })
+});
+
+
+
 
 module.exports = {
     registerSchema,
@@ -227,5 +332,10 @@ module.exports = {
     categorySchema,
     forumSchema,
     updateCategorySchema,
-    updateForumSchema
+    updateForumSchema,
+    postSchema,
+    updatePostSchema,
+    movePostSchema,
+    commentSchema,
+    updateCommentSchema
 };

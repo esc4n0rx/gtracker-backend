@@ -1,0 +1,185 @@
+{
+  "templates": [
+    {
+      "tipo": "filme",
+      "categorias_aplicaveis": ["Gtracker - HTTP", "Gtracker - Torrents"],
+      "campos": [
+        "tmdb_id",
+        "titulo_personalizado",
+        "qualidade",
+        "formato",
+        "idioma",
+        "legenda",
+        "duração",
+        "tamanho",
+        "links_download",
+        "informações_extra"
+      ],
+      "campos_api": ["poster", "sinopse", "elenco", "diretor", "generos", "ano_lancamento"]
+    },
+    {
+      "tipo": "série",
+      "categorias_aplicaveis": ["Gtracker - HTTP", "Gtracker - Torrents"],
+      "campos": [
+        "tmdb_id",
+        "temporada",
+        "episodios",
+        "qualidade",
+        "formato",
+        "idioma",
+        "legenda",
+        "tamanho",
+        "links_download",
+        "informações_extra"
+      ],
+      "campos_api": ["poster", "sinopse", "elenco", "criadores", "generos", "ano_lancamento"]
+    },
+    {
+      "tipo": "jogo",
+      "categorias_aplicaveis": ["Gtracker - HTTP"],
+      "campos": [
+        "titulo",
+        "poster",
+        "estilo",
+        "desenvolvedora",
+        "ano_lancamento",
+        "plataforma",
+        "sistema_operacional",
+        "config_minima",
+        "config_recomendada",
+        "idioma",
+        "formato",
+        "tamanho",
+        "links_download",
+        "informações_extra"
+      ]
+    },
+    {
+      "tipo": "software",
+      "categorias_aplicaveis": ["Gtracker - HTTP"],
+      "campos": [
+        "titulo",
+        "poster",
+        "versao",
+        "sistema_operacional",
+        "idioma",
+        "licenca",
+        "formato",
+        "tamanho",
+        "links_download",
+        "informações_extra"
+      ]
+    },
+    {
+      "tipo": "curso",
+      "categorias_aplicaveis": ["Gtracker - HTTP"],
+      "campos": [
+        "titulo",
+        "poster",
+        "plataforma_origem",
+        "instrutor",
+        "idioma",
+        "carga_horaria",
+        "categoria",
+        "formato",
+        "links_download",
+        "informações_extra"
+      ]
+    },
+    {
+      "tipo": "ebook",
+      "categorias_aplicaveis": ["Gtracker - HTTP", "Gtracker - Torrents"],
+      "campos": [
+        "titulo",
+        "autor",
+        "idioma",
+        "formato",
+        "ano_publicacao",
+        "categoria",
+        "tamanho",
+        "links_download",
+        "informações_extra"
+      ]
+    },
+    {
+      "tipo": "pedido_arquivo",
+      "categorias_aplicaveis": ["Gtracker - Social"],
+      "campos": [
+        "tipo_conteudo",
+        "titulo_desejado",
+        "informacoes_complementares",
+        "link_referencia",
+        "urgencia"
+      ]
+    },
+    {
+      "tipo": "candidatura",
+      "categorias_aplicaveis": ["Gtracker - Social"],
+      "campos": [
+        "cargo_desejado",
+        "experiencia_em_foruns",
+        "conhecimentos_tecnicos",
+        "tempo_disponivel",
+        "motivo_interesse"
+      ]
+    },
+    {
+      "tipo": "regras",
+      "categorias_aplicaveis": ["Gtracker - Social"],
+      "campos": [
+        "titulo",
+        "descricao_detalhada",
+        "ultima_atualizacao"
+      ]
+    },
+    {
+      "tipo": "anuncio_oficial",
+      "categorias_aplicaveis": ["Gtracker - Social"],
+      "campos": [
+        "titulo",
+        "mensagem",
+        "link_referencia",
+        "importancia"
+      ]
+    },
+    {
+      "tipo": "sugestao",
+      "categorias_aplicaveis": ["Gtracker - Social"],
+      "campos": [
+        "titulo",
+        "descricao",
+        "beneficios_para_o_forum",
+        "implementacao_sugerida"
+      ]
+    },
+    {
+      "tipo": "fale_conosco",
+      "categorias_aplicaveis": ["Gtracker - Social"],
+      "campos": [
+        "assunto",
+        "mensagem",
+        "link_referencia_opcional"
+      ]
+    },
+    {
+      "tipo": "apresentacao",
+      "categorias_aplicaveis": ["Gtracker - Social", "Gtracker - Comunidade"],
+      "campos": [
+        "nome_ou_apelido",
+        "como_conheceu_o_forum",
+        "interesses",
+        "categoria_favorita"
+      ]
+    },
+    {
+      "tipo": "duvida_suporte",
+      "categorias_aplicaveis": ["Gtracker - Comunidade"],
+      "campos": [
+        "titulo_problema",
+        "descricao_detalhada",
+        "categoria_relacionada",
+        "link_erro_ou_imagem"
+      ]
+    }
+  ]
+}
