@@ -1,3 +1,4 @@
+// src/app.js (atualizar para incluir as novas rotas)
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -8,6 +9,8 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const roleRoutes = require('./routes/roles');
 const userRoutes = require('./routes/users');
+const categoryRoutes = require('./routes/categories'); // Nova rota
+const forumRoutes = require('./routes/forums'); // Nova rota
 
 // Importar middlewares
 const { generalLimiter } = require('./middlewares/rateLimiter');
@@ -44,6 +47,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/categories', categoryRoutes); // Nova rota
+app.use('/api/forums', forumRoutes); // Nova rota
 
 // Rota de health check
 app.get('/api/health', (req, res) => {

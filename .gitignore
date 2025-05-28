@@ -185,6 +185,8 @@ temp/
 # Local development
 .local/
 local.*
+scripts/
+scripts
 
 # Editor directories and files
 .vscode/
