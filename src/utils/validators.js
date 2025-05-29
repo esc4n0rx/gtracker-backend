@@ -333,6 +333,78 @@ const notificationSettingsSchema = Joi.object({
     push_notifications: Joi.boolean().optional()
 });
 
+const profileCustomizationSchema = Joi.object({
+    theme_color: Joi.string()
+        .pattern(/^#[0-9A-F]{6}$/i)
+        .optional()
+        .messages({
+            'string.pattern.base': 'Cor do tema deve ser um código hexadecimal válido (ex: #1a1a1a)'
+        }),
+    custom_title: Joi.string()
+        .max(100)
+        .optional()
+        .allow('')
+        .messages({
+            'string.max': 'Título personalizado deve ter no máximo 100 caracteres'
+        }),
+    signature: Joi.string()
+        .max(500)
+        .optional()
+        .allow('')
+        .messages({
+            'string.max': 'Assinatura deve ter no máximo 500 caracteres'
+        }),
+    social_links: Joi.object({
+        twitter: Joi.string().uri().optional().allow(''),
+        instagram: Joi.string().uri().optional().allow(''),
+        facebook: Joi.string().uri().optional().allow(''),
+        linkedin: Joi.string().uri().optional().allow(''),
+        github: Joi.string().uri().optional().allow(''),
+        youtube: Joi.string().uri().optional().allow(''),
+        discord: Joi.string().optional().allow('')
+    }).optional(),
+    birthday: Joi.date()
+        .max('now')
+        .optional()
+        .allow(null)
+        .messages({
+            'date.max': 'Data de nascimento não pode ser no futuro'
+        }),
+    timezone: Joi.string()
+        .max(50)
+        .optional()
+        .messages({
+            'string.max': 'Timezone deve ter no máximo 50 caracteres'
+        }),
+    status: Joi.string()
+        .valid('online', 'away', 'busy', 'invisible', 'offline')
+        .optional()
+        .messages({
+            'any.only': 'Status deve ser: online, away, busy, invisible ou offline'
+        }),
+    bio: Joi.string()
+        .max(1000)
+        .optional()
+        .allow('')
+        .messages({
+            'string.max': 'Bio deve ter no máximo 1000 caracteres'
+        }),
+    location: Joi.string()
+        .max(100)
+        .optional()
+        .allow('')
+        .messages({
+            'string.max': 'Localização deve ter no máximo 100 caracteres'
+        }),
+    website: Joi.string()
+        .uri()
+        .optional()
+        .allow('')
+        .messages({
+            'string.uri': 'Website deve ser uma URL válida'
+        })
+});
+
 
 
 
@@ -350,5 +422,6 @@ module.exports = {
     movePostSchema,
     commentSchema,
     updateCommentSchema,
-    notificationSettingsSchema
+    notificationSettingsSchema,
+    profileCustomizationSchema
 };
