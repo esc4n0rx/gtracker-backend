@@ -252,6 +252,66 @@ class UserService {
         }
     }
 
+
+    static async getUsersForChat(currentUserId, page = 1, limit = 100, search = '') {
+        try {
+            const offset = (page - 1) * limit;
+            
+            let query = supabase
+                .from('gtracker_users')
+                .select(`
+                    id,
+                    nickname,
+                    nome,
+                    gtracker_profiles!inner(avatar_url)
+                `, { count: 'exact' })
+                .eq('is_active', true)
+                .neq('id', currentUserId) // Excluir o usuário atual
+                .order('nickname', { ascending: true })
+                .range(offset, offset + limit - 1);
+
+            // Filtro de busca por nickname ou nome
+            if (search && search.length > 0) {
+                query = query.or(`nickname.ilike.%${search}%,nome.ilike.%${search}%`);
+            }
+
+            const { data: users, error, count } = await query;
+
+            if (error) {
+                throw new Error('Erro ao buscar usuários: ' + error.message);
+            }
+
+            // Formatar resposta
+            const formattedUsers = users.map(user => ({
+                id: user.id,
+                nickname: user.nickname,
+                nome: user.nome,
+                gtracker_profiles: {
+                    avatar_url: user.gtracker_profiles.avatar_url
+                }
+            }));
+
+            return {
+                success: true,
+                message: 'Usuários listados com sucesso.',
+                data: formattedUsers,
+                pagination: {
+                    page,
+                    limit,
+                    total: count,
+                    totalPages: Math.ceil(count / limit)
+                }
+            };
+
+        } catch (error) {
+            console.error('Erro ao buscar usuários para chat:', error);
+            return {
+                success: false,
+                message: 'Erro interno do servidor'
+            };
+        }
+    }
+
     static async updateUserProfile(userId, updateData) {
         try {
             const { nome, nickname } = updateData;

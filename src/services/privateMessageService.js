@@ -69,11 +69,11 @@ class PrivateMessageService {
     }
 
     // Buscar mensagens de uma conversa
-    static async getConversationMessages(userId, otherUserId, page = 1, limit = 50) {
+    static async getConversationMessages(userId, otherUserId, page = 1, limit = 50, before = null) {
         try {
             const offset = (page - 1) * limit;
 
-            const { data: messages, error, count } = await supabase
+            let query = supabase
                 .from('gtracker_private_messages')
                 .select(`
                     id,
@@ -96,8 +96,31 @@ class PrivateMessageService {
                 `, { count: 'exact' })
                 .or(`and(sender_id.eq.${userId},recipient_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},recipient_id.eq.${userId})`)
                 .eq('is_deleted', false)
-                .order('created_at', { ascending: false })
-                .range(offset, offset + limit - 1);
+                .order('created_at', { ascending: false });
+
+            // Filtro 'before' para paginação temporal
+            if (before) {
+                // Se 'before' for uma data ISO
+                if (before.includes('T') || before.includes('-')) {
+                    query = query.lt('created_at', before);
+                }
+                // Se 'before' for um ID de mensagem, buscar a data dessa mensagem primeiro
+                else {
+                    const { data: beforeMessage, error: beforeError } = await supabase
+                        .from('gtracker_private_messages')
+                        .select('created_at')
+                        .eq('id', before)
+                        .single();
+
+                    if (!beforeError && beforeMessage) {
+                        query = query.lt('created_at', beforeMessage.created_at);
+                    }
+                }
+            }
+
+            query = query.range(offset, offset + limit - 1);
+
+            const { data: messages, error, count } = await query;
 
             if (error) {
                 throw new Error('Erro ao buscar mensagens: ' + error.message);
@@ -105,8 +128,9 @@ class PrivateMessageService {
 
             return {
                 success: true,
+                message: 'Mensagens da conversa carregadas.',
                 data: {
-                    messages: messages.reverse(),
+                    messages: messages.reverse(), // Inverter para ordem cronológica
                     pagination: {
                         page,
                         limit,

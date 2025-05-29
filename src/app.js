@@ -18,6 +18,7 @@ const notificationRoutes = require('./routes/notifications');
 const customizationRoutes = require('./routes/customization');
 const chatRoutes = require('./routes/chat');
 const privateMessageRoutes = require('./routes/privateMessages');
+const privateChatRoutes = require('./routes/privateChat');
 
 // Importar middlewares
 const { generalLimiter } = require('./middlewares/rateLimiter');
@@ -63,6 +64,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/customization', customizationRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/messages', privateMessageRoutes);
+app.use('/api/private', privateChatRoutes);
 
 // Rota de health check
 app.get('/api/health', (req, res) => {
