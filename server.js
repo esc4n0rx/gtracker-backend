@@ -1,12 +1,24 @@
 
 const app = require('./src/app');
+const { createServer } = require('http');
+const SocketManager = require('./src/socket/socketManager');
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
+// Criar servidor HTTP
+const server = createServer(app);
+
+// Inicializar Socket.IO
+const socketManager = new SocketManager(server);
+
+// Tornar socketManager disponível globalmente para notificações
+global.socketManager = socketManager;
+
+server.listen(PORT, () => {
     console.log(`
 🚀 GTracker Backend iniciado!
 📡 Servidor rodando na porta ${PORT}
+💬 Chat em tempo real ativo
 🌍 Ambiente: ${process.env.NODE_ENV || 'development'}
 ⏰ ${new Date().toISOString()}
     `);

@@ -11,6 +11,8 @@ class NotificationService {
         MENTION: 'mention',
         ROLE_CHANGED: 'role_changed',
         POST_MOVED: 'post_moved',
+        PRIVATE_MESSAGE: 'private_message',
+        CHAT_MENTION: 'chat_mention',
         PRIVATE_MESSAGE: 'private_message'
     };
 
@@ -174,6 +176,25 @@ class NotificationService {
             console.error('Erro ao notificar resposta em post:', error);
         }
     }
+
+    static async notifyChatMention(userId, mentionerNickname, messageContent, messageId) {
+            try {
+                await this.createNotification({
+                    userId,
+                    type: this.TYPES.CHAT_MENTION,
+                    title: 'Você foi mencionado no chat',
+                    message: `${mentionerNickname} mencionou você no chat: "${messageContent.substring(0, 100)}${messageContent.length > 100 ? '...' : ''}"`,
+                    actionUrl: '/chat',
+                    metadata: {
+                        message_id: messageId,
+                        message_preview: messageContent.substring(0, 200),
+                        mentioner_nickname: mentionerNickname
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao notificar menção no chat:', error);
+            }
+        }
 
     // Notificar resposta em comentário
     static async notifyCommentReply(commentId, replyAuthorId, replierNickname) {

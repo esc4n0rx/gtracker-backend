@@ -22,6 +22,7 @@
     "multer": "^2.0.0",
     "sharp": "^0.34.2",
     "sharp-multer": "^0.3.3",
+    "socket.io": "^4.8.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

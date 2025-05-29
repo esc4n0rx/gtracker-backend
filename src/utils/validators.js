@@ -405,6 +405,48 @@ const profileCustomizationSchema = Joi.object({
         })
 });
 
+const chatMessageSchema = Joi.object({
+    content: Joi.string()
+        .min(1)
+        .max(1000)
+        .required()
+        .messages({
+            'string.min': 'Mensagem não pode estar vazia',
+            'string.max': 'Mensagem deve ter no máximo 1000 caracteres'
+        }),
+    reply_to: Joi.string()
+        .uuid()
+        .optional()
+        .allow(null)
+        .messages({
+            'string.uuid': 'ID da mensagem de resposta deve ser um UUID válido'
+        })
+});
+
+const privateMessageSchema = Joi.object({
+    recipient_id: Joi.string()
+        .uuid()
+        .required()
+        .messages({
+            'string.uuid': 'ID do destinatário deve ser um UUID válido'
+        }),
+    content: Joi.string()
+        .min(1)
+        .max(5000)
+        .required()
+        .messages({
+            'string.min': 'Mensagem não pode estar vazia',
+            'string.max': 'Mensagem deve ter no máximo 5000 caracteres'
+        }),
+    reply_to: Joi.string()
+        .uuid()
+        .optional()
+        .allow(null)
+        .messages({
+            'string.uuid': 'ID da mensagem de resposta deve ser um UUID válido'
+        })
+});
+
 
 
 
@@ -423,5 +465,7 @@ module.exports = {
     commentSchema,
     updateCommentSchema,
     notificationSettingsSchema,
-    profileCustomizationSchema
+    profileCustomizationSchema,
+    chatMessageSchema,
+    privateMessageSchema
 };
