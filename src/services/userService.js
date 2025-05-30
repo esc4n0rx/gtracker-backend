@@ -12,6 +12,8 @@ class UserService {
                     nome,
                     created_at,
                     last_login,
+                    total_xp,
+                    current_level,
                     gtracker_roles!inner(
                         id,
                         name,
@@ -43,7 +45,17 @@ class UserService {
                         avatar_url,
                         bio,
                         location,
-                        website
+                        website,
+                        level_progress
+                    ),
+                    gtracker_levels!current_level(
+                        level_number,
+                        name,
+                        min_xp,
+                        max_xp,
+                        emoji,
+                        color,
+                        is_legendary
                     )
                 `)
                 .eq('id', userId)
@@ -64,6 +76,9 @@ class UserService {
                     nickname: user.nickname,
                     email: user.email,
                     nome: user.nome,
+                    total_xp: user.total_xp,
+                    current_level: user.current_level,
+                    level_info: user.gtracker_levels,
                     role: {
                         id: user.gtracker_roles.id,
                         name: user.gtracker_roles.name,
@@ -89,7 +104,10 @@ class UserService {
                             pode_configurar_forum: user.gtracker_roles.pode_configurar_forum
                         }
                     },
-                    profile: user.gtracker_profiles,
+                    profile: {
+                        ...user.gtracker_profiles,
+                        level_progress: user.gtracker_profiles.level_progress
+                    },
                     created_at: user.created_at,
                     last_login: user.last_login
                 }

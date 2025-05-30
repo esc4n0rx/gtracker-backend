@@ -1,11 +1,9 @@
-// src/services/authService.js - VERSÃO FINAL CORRIGIDA
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const supabase = require('../config/supabase');
 const { generateToken } = require('../utils/jwt');
 
 class AuthService {
-    // Gerar código de convite único
     static generateInviteCode() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let result = 'GT-';
@@ -15,7 +13,6 @@ class AuthService {
         return result;
     }
 
-    // Verificar se registro está aberto
     static async isRegistrationOpen() {
         const { data, error } = await supabase
             .from('gtracker_settings')
@@ -25,13 +22,12 @@ class AuthService {
 
         if (error) {
             console.error('Erro ao verificar configuração de registro:', error);
-            return true; // Default para aberto em caso de erro
+            return true; 
         }
 
         return data.value === 'true';
     }
 
-    // Validar código de convite
     static async validateInviteCode(code) {
         if (!code) return { valid: false, message: 'Código de convite é obrigatório' };
 
@@ -170,6 +166,36 @@ class AuthService {
             if (newInviteError) {
                 console.error('Erro ao criar código de convite:', newInviteError);
             }
+
+            // Inicializar usuário com nível 1 e 0 XP
+                const { error: levelError } = await supabase
+                    .from('gtracker_users')
+                    .update({
+                        total_xp: 0,
+                        current_level: 1,
+                        last_xp_action: new Date().toISOString()
+                    })
+                    .eq('id', newUser.id);
+
+                if (levelError) {
+                    console.error('Erro ao inicializar nível do usuário:', levelError);
+                }
+
+                const { error: progressError } = await supabase
+                    .from('gtracker_profiles')
+                    .update({
+                        level_progress: {
+                            current_level: 1,
+                            level_name: 'Iniciante',
+                            xp_to_next: 100,
+                            percentage: 0
+                        }
+                    })
+                    .eq('user_id', newUser.id);
+
+                if (progressError) {
+                    console.error('Erro ao inicializar progresso:', progressError);
+                }
 
             return {
                 success: true,

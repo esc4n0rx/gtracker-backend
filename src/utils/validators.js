@@ -447,7 +447,31 @@ const privateMessageSchema = Joi.object({
         })
 });
 
-
+const manualXPSchema = Joi.object({
+    user_id: Joi.string()
+        .uuid()
+        .required()
+        .messages({
+            'string.uuid': 'ID do usuário deve ser um UUID válido'
+        }),
+    xp_amount: Joi.number()
+        .integer()
+        .min(-1000)
+        .max(5000)
+        .required()
+        .messages({
+            'number.min': 'XP deve ser entre -1000 e 5000',
+            'number.max': 'XP deve ser entre -1000 e 5000'
+        }),
+    reason: Joi.string()
+        .min(3)
+        .max(200)
+        .required()
+        .messages({
+            'string.min': 'Motivo deve ter pelo menos 3 caracteres',
+            'string.max': 'Motivo deve ter no máximo 200 caracteres'
+        })
+});
 
 
 module.exports = {
@@ -467,5 +491,6 @@ module.exports = {
     notificationSettingsSchema,
     profileCustomizationSchema,
     chatMessageSchema,
-    privateMessageSchema
+    privateMessageSchema,
+    manualXPSchema
 };

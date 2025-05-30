@@ -103,6 +103,9 @@ class CommentService {
             // Atualizar contagem de comentários do usuário
             await supabase.rpc('increment_user_comment_count', { user_id: userId });
 
+            const LevelService = require('./levelService');
+            await LevelService.awardCommentCreated(userId, post_id, newComment.id);
+
             const { data: commenter, error: commenterError } = await supabase
                 .from('gtracker_users')
                 .select('nickname, nome')
@@ -493,6 +496,14 @@ class CommentService {
                         userId,
                         liker.nickname
                     );
+                }
+
+                const LevelService = require('./levelService');
+    
+                await LevelService.awardLikeGiven(userId, comment.author_id, null, commentId);
+                
+                if (comment.author_id !== userId) {
+                    await LevelService.awardLikeReceived(comment.author_id, userId, null, commentId);
                 }
 
                 return {

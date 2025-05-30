@@ -1,10 +1,10 @@
-// src/app.js (versão final atualizada)
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
 
-// Importar rotas
+
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const roleRoutes = require('./routes/roles');
@@ -19,30 +19,28 @@ const customizationRoutes = require('./routes/customization');
 const chatRoutes = require('./routes/chat');
 const privateMessageRoutes = require('./routes/privateMessages');
 const privateChatRoutes = require('./routes/privateChat');
+const levelRoutes = require('./routes/levels');
 
-// Importar middlewares
 const { generalLimiter } = require('./middlewares/rateLimiter');
 
 const app = express();
 
-// Middlewares de segurança
 app.use(helmet());
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true
 }));
 
-// Middleware para parsing de JSON
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Trust proxy para obter o IP real em produção
+
 app.set('trust proxy', 1);
 
-// Rate limiting geral
+
 app.use(generalLimiter);
 
-// Middleware de log de requisições (apenas em desenvolvimento)
 if (process.env.NODE_ENV === 'development') {
     app.use((req, res, next) => {
         console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - IP: ${req.ip}`);
@@ -65,6 +63,7 @@ app.use('/api/customization', customizationRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/messages', privateMessageRoutes);
 app.use('/api/private', privateChatRoutes);
+app.use('/api/levels', levelRoutes);
 
 // Rota de health check
 app.get('/api/health', (req, res) => {

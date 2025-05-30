@@ -2,6 +2,7 @@
 const app = require('./src/app');
 const { createServer } = require('http');
 const SocketManager = require('./src/socket/socketManager');
+const PopularPostsJob = require('./src/jobs/popularPostsJob');
 
 const PORT = process.env.PORT || 3001;
 
@@ -10,6 +11,8 @@ const server = createServer(app);
 
 // Inicializar Socket.IO
 const socketManager = new SocketManager(server);
+
+PopularPostsJob.startJob();
 
 // Tornar socketManager disponível globalmente para notificações
 global.socketManager = socketManager;

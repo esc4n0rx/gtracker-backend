@@ -191,6 +191,9 @@ class PostService {
             // Atualizar contagem de posts do usuário
             await supabase.rpc('increment_user_post_count', { user_id: userId });
 
+            const LevelService = require('./levelService');
+            await LevelService.awardPostCreated(userId, newPost.id);
+
             // Processar menções no conteúdo
             if (content) {
                 await NotificationService.processMentions(
@@ -549,10 +552,15 @@ class PostService {
             // Atualizar estatísticas do fórum
             await supabase.rpc('update_forum_stats_after_delete', { forum_id: post.forum_id });
 
+            const LevelService = require('./levelService');
+            await LevelService.penalizePostRemoved(userId, postId);
+
             return {
                 success: true,
                 message: 'Post deletado com sucesso'
             };
+
+            
 
         } catch (error) {
             console.error('Erro ao deletar post:', error);
@@ -758,6 +766,13 @@ class PostService {
                         userId,
                         liker.nickname
                     );
+                }
+
+                const LevelService = require('./levelService');
+                await LevelService.awardLikeGiven(userId, post.author_id, postId);
+
+                if (post.author_id !== userId) {
+                    await LevelService.awardLikeReceived(post.author_id, userId, postId);
                 }
 
                 return {
